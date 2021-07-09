@@ -8,7 +8,7 @@ import ImageList from '@material-ui/core/ImageList';
 import ImageListItem from '@material-ui/core/ImageListItem';
 import ImageListItemBar from '@material-ui/core/ImageListItemBar';
 import IconButton from '@material-ui/core/IconButton';
-//import InfoIcon from '@material-ui/icons/InfoIcon';
+import InfoIcon from '@material-ui/icons/Info';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -17,33 +17,9 @@ const useStyles = makeStyles((theme) => ({
   container: {
     flexGrow: 1
   },
-  contentTitle: {
-    margin: theme.spacing(2.4, 0, 0.6)
+  icon: {
+    color: 'rgba(255, 255, 255, 0.54)',
   },
-  contentContent: {
-    margin: theme.spacing(0, 0, 0)
-  },
-  contentTag: {
-    margin: theme.spacing(0.3),
-    fontSize: 11
-  },
-  contentDate: {
-    margin: theme.spacing(0.5, 0),
-    fontSize: 12
-  },
-  root: {
-    flexGrow: 1,
-    margin: theme.spacing(2),
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-  card: {
-    minHeight: 180,
-    maxHeight: 400,
-  }
 }))
 
 function Home() {
@@ -51,6 +27,9 @@ function Home() {
 
   const [s3files, setS3Files] = useState([])
 
+  const imagePrefix = {
+    public: 'images/'
+  }
   
   function copyUrl(url) {
     const input = document.createElement('input')
@@ -65,13 +44,14 @@ function Home() {
     async function doList() {
       try {
         Storage.list('', {
-          customPrefix: 'images/',
+          customPrefix: imagePrefix,
         })
           .then(result => {
             console.log(result)
             const fs = []
             for (const obj of result) {
               if (obj.key) {
+                console.log(obj.key)
                 fs.push({
                   url: 'https://images.figmentresearch.com/images/' + obj.key,
                   lastModified: obj.lastModified,
@@ -103,6 +83,11 @@ function Home() {
               <img src={obj.url} alt={obj.key} />
               <ImageListItemBar
                 subtitle={obj.lastModified.toJSON() + ' ' + parseInt(obj.size/1000) + 'KB'}
+                actionIcon={
+                  <IconButton aria-label={obj.url} className={classes.icon} onClick={() => copyUrl(obj.url)}>
+                    <InfoIcon />
+                  </IconButton>
+                }
               />
             </ImageListItem>
           ))}
@@ -113,11 +98,3 @@ function Home() {
 }
 
 export default Home
-
-/*
-                actionIcon={
-                  <IconButton aria-label={obj.url} className={classes.icon} onClick={() => copyUrl(obj.url)}>
-                    <InfoIcon />
-                  </IconButton>
-                }
-*/
